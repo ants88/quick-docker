@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+src-tauri/target/
+src-tauri/binaries/
+.claude/
+
+# PyInstaller
+backend/build/
+backend/dist/
+backend/*.spec
+
+# Tauri generated
+src-tauri/gen/

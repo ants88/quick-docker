@@ -1,0 +1,43 @@
+{
+  "productName": "QuickDocker",
+  "version": "0.1.0",
+  "identifier": "com.quickdocker.desktop",
+  "build": {
+    "devUrl": "http://localhost:8000",
+    "frontendDist": "../frontend"
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.png"
+    ],
+    "externalBin": ["binaries/quickdocker-backend"],
+    "resources": ["../frontend/**/*"],
+    "linux": {
+      "deb": {
+        "depends": ["docker.io | docker-ce"],
+        "section": "utils",
+        "desktopTemplate": "quickdocker.desktop"
+      }
+    }
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "QuickDocker",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 800,
+        "minHeight": 600,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; connect-src 'self' http://localhost:8000 ws://localhost:8000; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'"
+    }
+  }
+}

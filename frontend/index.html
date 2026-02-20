@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickDocker</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="vendor/xterm.min.css">
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar">
+      <div class="sidebar-header">
+        <h1>QuickDocker</h1>
+        <span id="connection-dot" class="dot dot-stopped" title="Disconnected"></span>
+      </div>
+      <ul id="project-list"></ul>
+    </aside>
+    <main id="main">
+      <div id="empty-state">
+        <p>Select a project from the sidebar</p>
+      </div>
+      <div id="project-view" class="hidden">
+        <header id="project-header">
+          <div class="project-title">
+            <span id="project-status-dot" class="dot"></span>
+            <h2 id="project-name"></h2>
+          </div>
+          <div id="project-actions"></div>
+        </header>
+        <div id="container-list"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Log modal -->
+  <div id="log-modal" class="modal hidden">
+    <div class="modal-content modal-logs">
+      <div class="modal-header">
+        <h3 id="log-title">Logs</h3>
+        <button class="btn btn-icon" id="log-close">&times;</button>
+      </div>
+      <pre id="log-output"></pre>
+    </div>
+  </div>
+
+  <!-- Terminal modal -->
+  <div id="term-modal" class="modal hidden">
+    <div class="modal-content modal-terminal">
+      <div class="modal-header">
+        <h3 id="term-title">Terminal</h3>
+        <button class="btn btn-icon" id="term-close">&times;</button>
+      </div>
+      <div id="terminal-container"></div>
+    </div>
+  </div>
+
+  <!-- Confirm dialog -->
+  <div id="confirm-modal" class="modal hidden">
+    <div class="modal-content modal-confirm">
+      <p id="confirm-message"></p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" id="confirm-cancel">Cancel</button>
+        <button class="btn btn-danger" id="confirm-ok">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="vendor/xterm.min.js"></script>
+  <script src="vendor/addon-fit.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

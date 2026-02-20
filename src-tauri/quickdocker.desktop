@@ -1,0 +1,8 @@
+[Desktop Entry]
+Categories=Development;Utility;
+Comment=Lightweight Docker manager
+Exec=quick-docker
+Icon=quick-docker
+Name=QuickDocker
+Terminal=false
+Type=Application

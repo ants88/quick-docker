@@ -1,0 +1,134 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            label: linux-amd64
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            label: macos-arm64
+          - os: macos-13
+            target: x86_64-apple-darwin
+            label: macos-x64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            label: windows-x64
+
+    runs-on: ${{ matrix.os }}
+    name: Build (${{ matrix.label }})
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Linux system deps
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev libgtk-3-dev libjavascriptcoregtk-4.1-dev \
+            libsoup-3.0-dev librsvg2-dev patchelf
+
+      # Build backend binary with PyInstaller
+      - name: Build backend binary
+        shell: bash
+        run: |
+          cd backend
+          pip install -r requirements.txt pyinstaller
+
+          # Windows uses ; as path separator in --add-data
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            SEP=";"
+            EXTRA_COLLECT=""
+          else
+            SEP=":"
+            EXTRA_COLLECT="--collect-submodules uvloop"
+          fi
+
+          pyinstaller \
+            --onefile \
+            --name quickdocker-backend \
+            --clean \
+            --noconfirm \
+            --log-level WARN \
+            --add-data "docker_manager.py${SEP}." \
+            --hidden-import docker_manager \
+            --hidden-import uvicorn.logging \
+            --hidden-import uvicorn.loops \
+            --hidden-import uvicorn.loops.auto \
+            --hidden-import uvicorn.protocols \
+            --hidden-import uvicorn.protocols.http \
+            --hidden-import uvicorn.protocols.http.auto \
+            --hidden-import uvicorn.protocols.websockets \
+            --hidden-import uvicorn.protocols.websockets.auto \
+            --hidden-import uvicorn.lifespan \
+            --hidden-import uvicorn.lifespan.on \
+            --hidden-import uvicorn.lifespan.off \
+            --collect-submodules uvicorn \
+            $EXTRA_COLLECT \
+            --collect-submodules httptools \
+            run_server.py
+
+      # Place sidecar binary for Tauri
+      - name: Place sidecar binary
+        shell: bash
+        run: |
+          mkdir -p src-tauri/binaries
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            cp backend/dist/quickdocker-backend.exe "src-tauri/binaries/quickdocker-backend-${{ matrix.target }}.exe"
+          else
+            cp backend/dist/quickdocker-backend "src-tauri/binaries/quickdocker-backend-${{ matrix.target }}"
+          fi
+
+      # Install npm deps and build Tauri
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'QuickDocker ${{ github.ref_name }}'
+          releaseBody: |
+            ## QuickDocker ${{ github.ref_name }}
+
+            Download the installer for your platform below.
+
+            | Platform | File |
+            |---|---|
+            | Ubuntu / Debian | `.deb` |
+            | macOS (Apple Silicon) | `.dmg` |
+            | macOS (Intel) | `.dmg` |
+            | Windows | `.msi` or `.exe` |
+          releaseDraft: false
+          prerelease: false
