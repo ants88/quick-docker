@@ -128,6 +128,7 @@
     actions.innerHTML = `
       <button class="btn btn-success btn-sm" data-compose="up">&#9654; Up</button>
       <button class="btn btn-sm" data-compose="restart">&#8635; Restart</button>
+      <button class="btn btn-sm" data-compose="stop">&#9724; Stop</button>
       <button class="btn btn-danger btn-sm" data-compose="down">&#9632; Down</button>
     `;
     actions.querySelectorAll("[data-compose]").forEach((btn) => {

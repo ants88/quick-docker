@@ -73,7 +73,7 @@ async def list_containers():
 @app.post("/api/compose/{project}/{action}")
 async def compose_action(project: str, action: str):
     logger.info("Compose %s on project '%s'", action, project)
-    if action not in ("up", "down", "restart"):
+    if action not in ("up", "down", "stop", "restart"):
         raise HTTPException(status_code=400, detail=f"Invalid action: {action}")
     result = await asyncio.to_thread(dm.compose_action, project, action)
     if not result["ok"]:
