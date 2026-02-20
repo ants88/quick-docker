@@ -53,13 +53,12 @@ cd "$ROOT"
 
 # --- Step 3: Place binary for Tauri sidecar ---
 echo "[3/5] Placing sidecar binary..."
-mkdir -p "$ROOT/src-tauri/binaries"
 cp "$ROOT/backend/dist/quickdocker-backend" \
-   "$ROOT/src-tauri/binaries/quickdocker-backend-${TARGET_TRIPLE}"
+   "$ROOT/src-tauri/quickdocker-backend-${TARGET_TRIPLE}"
 
 # Verify it works
 echo -n "    Testing binary... "
-timeout 5 "$ROOT/src-tauri/binaries/quickdocker-backend-${TARGET_TRIPLE}" &
+timeout 5 "$ROOT/src-tauri/quickdocker-backend-${TARGET_TRIPLE}" &
 BACKEND_PID=$!
 sleep 3
 if curl -sf http://127.0.0.1:8000/api/health > /dev/null 2>&1; then

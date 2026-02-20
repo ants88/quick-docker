@@ -13,7 +13,7 @@
       "identifier": "shell:allow-execute",
       "allow": [
         {
-          "name": "binaries/quickdocker-backend",
+          "name": "quickdocker-backend",
           "sidecar": true
         }
       ]

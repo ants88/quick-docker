@@ -15,7 +15,7 @@
       "icons/128x128@2x.png",
       "icons/icon.png"
     ],
-    "externalBin": ["binaries/quickdocker-backend"],
+    "externalBin": ["quickdocker-backend"],
     "resources": ["../frontend/**/*"],
     "linux": {
       "deb": {

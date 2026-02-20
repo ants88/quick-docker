@@ -8,7 +8,7 @@ pub fn run() {
             // Spawn the Python backend as a sidecar process
             let shell = app.shell();
             let sidecar = shell
-                .sidecar("binaries/quickdocker-backend")
+                .sidecar("quickdocker-backend")
                 .expect("failed to create sidecar command");
 
             let (mut _rx, child) = sidecar.spawn().expect("failed to spawn backend sidecar");

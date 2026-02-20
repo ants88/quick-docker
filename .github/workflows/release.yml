@@ -101,11 +101,10 @@ jobs:
       - name: Place sidecar binary
         shell: bash
         run: |
-          mkdir -p src-tauri/binaries
           if [ "${{ runner.os }}" = "Windows" ]; then
-            cp backend/dist/quickdocker-backend.exe "src-tauri/binaries/quickdocker-backend-${{ matrix.target }}.exe"
+            cp backend/dist/quickdocker-backend.exe "src-tauri/quickdocker-backend-${{ matrix.target }}.exe"
           else
-            cp backend/dist/quickdocker-backend "src-tauri/binaries/quickdocker-backend-${{ matrix.target }}"
+            cp backend/dist/quickdocker-backend "src-tauri/quickdocker-backend-${{ matrix.target }}"
           fi
 
       # Install npm deps and build Tauri
