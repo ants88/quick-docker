@@ -11,6 +11,7 @@ from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from docker.errors import DockerException, NotFound
@@ -32,6 +33,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.exception_handler(DockerException)
 async def docker_exception_handler(request, exc):
@@ -40,55 +48,72 @@ async def docker_exception_handler(request, exc):
 
 @app.get("/api/health")
 async def health():
+    logger.info("Health check requested")
     result = await asyncio.to_thread(dm.health_check)
     if not result["ok"]:
+        logger.error("Health check failed: %s", result["error"])
         raise HTTPException(status_code=503, detail=result["error"])
     return result
 
 
 @app.get("/api/projects")
 async def list_projects():
-    return await asyncio.to_thread(dm.list_projects)
+    projects = await asyncio.to_thread(dm.list_projects)
+    logger.info("Listed %d projects", len(projects))
+    return projects
 
 
 @app.get("/api/containers")
 async def list_containers():
-    return await asyncio.to_thread(dm.list_containers)
+    containers = await asyncio.to_thread(dm.list_containers)
+    logger.info("Listed %d containers", len(containers))
+    return containers
 
 
 @app.post("/api/compose/{project}/{action}")
 async def compose_action(project: str, action: str):
+    logger.info("Compose %s on project '%s'", action, project)
     if action not in ("up", "down", "restart"):
         raise HTTPException(status_code=400, detail=f"Invalid action: {action}")
     result = await asyncio.to_thread(dm.compose_action, project, action)
     if not result["ok"]:
+        logger.error("Compose %s failed on '%s': %s", action, project, result["error"])
         raise HTTPException(status_code=500, detail=result["error"])
+    logger.info("Compose %s on '%s' succeeded", action, project)
     return result
 
 
 @app.post("/api/container/{container_id}/{action}")
 async def container_action(container_id: str, action: str):
+    logger.info("Container %s on %s", action, container_id)
     if action not in ("start", "stop", "restart"):
         raise HTTPException(status_code=400, detail=f"Invalid action: {action}")
     result = await asyncio.to_thread(dm.container_action, container_id, action)
     if not result["ok"]:
+        logger.error("Container %s failed on %s: %s", action, container_id, result["error"])
         raise HTTPException(status_code=500, detail=result["error"])
+    logger.info("Container %s on %s succeeded", action, container_id)
     return result
 
 
 @app.delete("/api/container/{container_id}")
 async def container_remove(container_id: str):
+    logger.info("Removing container %s", container_id)
     result = await asyncio.to_thread(dm.container_action, container_id, "remove")
     if not result["ok"]:
+        logger.error("Remove failed on %s: %s", container_id, result["error"])
         raise HTTPException(status_code=500, detail=result["error"])
+    logger.info("Container %s removed", container_id)
     return result
 
 
 @app.get("/api/container/{container_id}/logs")
 async def container_logs(container_id: str, tail: int = 200):
+    logger.info("Opening log stream for container %s (tail=%d)", container_id, tail)
     try:
         log_gen = await asyncio.to_thread(dm.container_logs, container_id, tail)
     except NotFound:
+        logger.error("Container %s not found for logs", container_id)
         raise HTTPException(status_code=404, detail="Container not found")
 
     async def sse_stream():
