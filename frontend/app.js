@@ -14,8 +14,10 @@
     resizeObserver: null,
   };
 
-  const BASE = `${location.protocol}//${location.host}`;
-  const WS_BASE = `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}`;
+  // When running inside Tauri, location.protocol is "tauri:" so we need to hardcode the backend URL
+  const isTauri = location.protocol === "tauri:" || location.protocol === "https:" && location.host === "tauri.localhost";
+  const BASE = isTauri ? "http://127.0.0.1:8000" : `${location.protocol}//${location.host}`;
+  const WS_BASE = isTauri ? "ws://127.0.0.1:8000" : `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}`;
 
   // --- API client ---
   async function api(path, opts = {}) {
