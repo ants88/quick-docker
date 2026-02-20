@@ -61,7 +61,7 @@ echo -n "    Testing binary... "
 timeout 5 "$ROOT/src-tauri/quickdocker-backend-${TARGET_TRIPLE}" &
 BACKEND_PID=$!
 sleep 3
-if curl -sf http://127.0.0.1:8000/api/health > /dev/null 2>&1; then
+if curl -sf http://127.0.0.1:18093/api/health > /dev/null 2>&1; then
     echo "OK"
 else
     echo "WARNING: binary health check failed (Docker might not be running)"
