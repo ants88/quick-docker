@@ -40,7 +40,7 @@ QuickDocker gives you:
 | Interactive terminal | Full shell access via xterm.js + WebSocket |
 | Live state updates | WebSocket polling every 2s |
 | Dark theme | Tokyo Night color scheme, easy on the eyes |
-| Two modes | Native desktop app (Tauri) or browser at `localhost:8000` |
+| Two modes | Native desktop app (Tauri) or browser at `localhost:18093` |
 
 ## Installation
 
@@ -70,7 +70,7 @@ chmod +x run.sh
 ./run.sh
 ```
 
-Opens in your browser at http://localhost:8000. Requires Python 3.10+ and Docker.
+Opens in your browser at http://localhost:18093. Requires Python 3.10+ and Docker.
 
 The script auto-creates a virtual environment and installs dependencies on first run.
 
@@ -157,7 +157,7 @@ sudo usermod -aG docker $USER
 # Then log out and back in
 ```
 
-**Port 8000 already in use** - Kill the existing process: `fuser -k 8000/tcp`
+**Port 18093 already in use** - Kill the existing process: `fuser -k 18093/tcp`
 
 ## Contributing
 

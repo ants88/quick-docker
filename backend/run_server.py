@@ -223,7 +223,7 @@ if frontend_dir:
 
 
 def main():
-    port = int(os.environ.get("QUICKDOCKER_PORT", "8000"))
+    port = int(os.environ.get("QUICKDOCKER_PORT", "18093"))
     uvicorn.run(app, host="127.0.0.1", port=port, log_level="info")
 
 

@@ -38,14 +38,14 @@ fi
 
 echo "Starting QuickDocker backend..."
 "$VENV/bin/uvicorn" backend.main:app \
-    --host 127.0.0.1 --port 8000 --reload \
+    --host 127.0.0.1 --port 18093 --reload \
     --app-dir "$ROOT" &
 BACKEND_PID=$!
 
 # Wait for backend to be ready
 echo -n "Waiting for backend"
 for i in $(seq 1 30); do
-    if curl -sf http://127.0.0.1:8000/api/health >/dev/null 2>&1; then
+    if curl -sf http://127.0.0.1:18093/api/health >/dev/null 2>&1; then
         echo " ready!"
         break
     fi
@@ -53,7 +53,7 @@ for i in $(seq 1 30); do
     sleep 1
 done
 
-if ! curl -sf http://127.0.0.1:8000/api/health >/dev/null 2>&1; then
+if ! curl -sf http://127.0.0.1:18093/api/health >/dev/null 2>&1; then
     echo " FAILED"
     echo "Backend did not start. Check logs above."
     cleanup
@@ -68,7 +68,7 @@ if [ "${1:-}" = "--tauri" ]; then
     wait "$TAURI_PID" 2>/dev/null || true
 else
     echo ""
-    echo "QuickDocker running at: http://localhost:8000"
+    echo "QuickDocker running at: http://localhost:18093"
     echo "Press Ctrl+C to stop."
     echo ""
     wait "$BACKEND_PID"
